@@ -1,4 +1,5 @@
-![Figure 1](Figure 1.png)
+![Image](image.png)
+
 
 
 # Geometric Heterogeneity of Glioblastoma Necrosis (BraTS 2020)
