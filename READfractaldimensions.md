@@ -1,3 +1,6 @@
+![Figure 1](Figure 1.png)
+
+
 # Geometric Heterogeneity of Glioblastoma Necrosis (BraTS 2020)
 
 This repository contains the source code for the retrospective radiomic analysis of 231 Glioblastoma patients from the BraTS 2020 dataset.
