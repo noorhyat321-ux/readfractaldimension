@@ -1,4 +1,5 @@
-![Image](image.png)
+![Figure 1](Figure_1.png)
+
 
 
 
