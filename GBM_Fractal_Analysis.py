@@ -65,56 +65,77 @@ def get_fractal_dimension(binary_mask):
 # Data is already in FINAL_MASTER_DATA.csv for analysis.
 
 # ==============================================================================
-# PART 4: STATISTICAL ANALYSIS
+# PART 4: STATISTICAL ANALYSIS (The Complete Pipeline)
 # ==============================================================================
+import pandas as pd
+import numpy as np
+from lifelines import CoxPHFitter
+from scipy.stats import pearsonr, ttest_ind
+
+# 1. Load and Prep Data
 df = pd.read_csv('FINAL_MASTER_DATA.csv')
 df['LogVolume'] = np.log1p(df['Necrosis_Volume_mm3'])
 
-print(">>> 1. MORPHOLOGICAL CORRELATION <<<")
-r_val, p_val = pearsonr(df['LogVolume'], df['FractalDimension'])
-print(f"Correlation (FD vs Volume): r={r_val:.4f}, p={p_val:.2e}")
-
-print("\n>>> 2. SURGICAL RESECTABILITY <<<")
-if 'Extent_of_Resection' in df.columns:
-    # Map GTR/STR to numeric codes for optional analysis
-    mapping = {'GTR': 0, 'STR': 1}
-    surgery_df = df[df['Extent_of_Resection'].isin(['GTR', 'STR'])].copy()
-    surgery_df['Surgery_Code'] = surgery_df['Extent_of_Resection'].map(mapping)
-    
-    gtr = surgery_df[surgery_df['Extent_of_Resection'] == 'GTR']['FractalDimension']
-    str_group = surgery_df[surgery_df['Extent_of_Resection'] == 'STR']['FractalDimension']
-    
-    t_stat, p_surgery = ttest_ind(gtr, str_group)
-    print(f"T-Test (GTR vs STR): p={p_surgery:.4f}")
-else:
-    print("Surgery column not found or not formatted.")
-
-# Prepare Survival Data
+# Prepare Survival Dataframe (Drop missing values for Cox)
 stats_df = df.dropna(subset=['Survival_days', 'Age', 'FractalDimension', 'LogVolume'])
 stats_df['Duration'] = pd.to_numeric(stats_df['Survival_days'])
 stats_df['Event'] = 1 
+
+print(">>> 1. MORPHOLOGICAL CORRELATION (Figure 2 Data) <<<")
+r_val, p_val = pearsonr(df['LogVolume'], df['FractalDimension'])
+print(f"Correlation (FD vs Volume): r={r_val:.4f}, p={p_val:.2e}")
+print("-" * 60)
+
+print(">>> 2. UNIVARIATE SURVIVAL ANALYSIS (Table 2 Left Column) <<<")
 cph = CoxPHFitter()
 
-print("\n>>> 3. UNIVARIATE COX REGRESSION <<<")
-# Manuscript Figure/Table: Volume Alone
-cph.fit(stats_df[['Duration', 'Event', 'LogVolume']], duration_col='Duration', event_col='Event')
-print(f"Volume Alone: p={cph.summary.loc['LogVolume', 'p']:.5f} (HR={cph.summary.loc['LogVolume', 'exp(coef)']:.2f})")
+# List of variables to test individually
+variables = {
+    'FractalDimension': stats_df,
+    'LogVolume': stats_df,
+    'Age': stats_df
+}
 
-# Manuscript Figure/Table: FD Alone
-cph.fit(stats_df[['Duration', 'Event', 'FractalDimension']], duration_col='Duration', event_col='Event')
-print(f"Fractal Alone: p={cph.summary.loc['FractalDimension', 'p']:.5f} (HR={cph.summary.loc['FractalDimension', 'exp(coef)']:.2f})")
+for var, data in variables.items():
+    cph.fit(data[['Duration', 'Event', var]], duration_col='Duration', event_col='Event')
+    hr = cph.summary.loc[var, 'exp(coef)']
+    p = cph.summary.loc[var, 'p']
+    print(f"{var}: HR={hr:.4f}, p={p:.5f}")
 
-print("\n>>> 4. MULTIVARIATE COX REGRESSION <<<")
-cols = ['Duration', 'Event', 'FractalDimension', 'Age', 'LogVolume']
-if 'Surgery_Code' in surgery_df.columns:
-    stats_df_surg = stats_df.merge(surgery_df[['Brats20ID', 'Surgery_Code']], on='Brats20ID', how='inner')
-    print(f"Running Multivariate on Surgical Sub-cohort (n={len(stats_df_surg)})...")
-    cph.fit(stats_df_surg[cols + ['Surgery_Code']], duration_col='Duration', event_col='Event')
+# Surgery needs special handling (Categorical)
+if 'Extent_of_Resection' in df.columns:
+    # Filter for GTR/STR and map to numbers
+    surg_df = df[df['Extent_of_Resection'].isin(['GTR', 'STR'])].copy()
+    surg_df['Duration'] = pd.to_numeric(surg_df['Survival_days'])
+    surg_df['Event'] = 1
+    surg_df['Surgery_Code'] = surg_df['Extent_of_Resection'].map({'GTR': 0, 'STR': 1})
+    
+    cph.fit(surg_df[['Duration', 'Event', 'Surgery_Code']], duration_col='Duration', event_col='Event')
+    hr_surg = cph.summary.loc['Surgery_Code', 'exp(coef)']
+    p_surg = cph.summary.loc['Surgery_Code', 'p']
+    print(f"Surgery (Code): HR={hr_surg:.4f}, p={p_surg:.5f}")
+    print(f"   -> Inverted HR (Risk of STR vs GTR): {1/hr_surg:.4f}")
 else:
-    print("Running Multivariate on Full Cohort (No Surgery)...")
-    cph.fit(stats_df[cols], duration_col='Duration', event_col='Event')
+    print("Surgery column not found.")
+print("-" * 60)
 
-print(cph.summary[['exp(coef)', 'p', 'z']])
+print(">>> 3. MULTIVARIATE COX REGRESSION (Table 2 Right Column) <<<")
+# We use the surgical sub-cohort if possible to match the paper
+if 'Extent_of_Resection' in df.columns:
+    # Reuse the surg_df from above which has GTR/STR filtered
+    # We need to ensure it has Age/FD/Vol too (it does from df)
+    # Re-prep the surgical dataframe to include all covariates
+    multi_df = surg_df.dropna(subset=['Age', 'FractalDimension', 'LogVolume'])
+    
+    cph.fit(multi_df[['Duration', 'Event', 'FractalDimension', 'Age', 'LogVolume', 'Surgery_Code']], 
+            duration_col='Duration', event_col='Event')
+    print(f"n={len(multi_df)} patients")
+    print(cph.summary[['exp(coef)', 'p', 'z']])
+else:
+    print("Running on full cohort (No Surgery variable)")
+    cph.fit(stats_df[['Duration', 'Event', 'FractalDimension', 'Age', 'LogVolume']], 
+            duration_col='Duration', event_col='Event')
+    print(cph.summary[['exp(coef)', 'p', 'z']])
 
 # ==============================================================================
 # PART 5: FIGURE GENERATION
