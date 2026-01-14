@@ -30,9 +30,9 @@ This repository contains the full computational pipeline, statistical analysis, 
 
 | File | Description |
 | :--- | :--- |
-| `GBM_Fractal_Analysis.ipynb` | **The Master Notebook.** Contains the full pipeline: Image Loading, 3D Box-Counting, Statistical Analysis, and Figure Generation. |
+| `GBM_Fractal_Analysis.py` | **The Master Notebook.** Contains the full pipeline: Image Loading, 3D Box-Counting, Statistical Analysis, and Figure Generation. |
 | `requirements.txt` | List of Python dependencies required to run the analysis. |
-| `Supplementary_Data.csv` | Anonymized processed data containing calculated FD, Volume, and Survival data for the cohort (n=231). |
+| `Supplementary_Data_GBM.xlsx` | Anonymized processed data containing calculated FD, Volume, and Survival data for the cohort (n=231). |
 
 ---
 
