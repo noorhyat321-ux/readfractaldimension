@@ -36,6 +36,36 @@ This repository contains the full computational pipeline, statistical analysis, 
 
 ---
 
+---
+
+## 📂 Supplementary Analysis (Journal Submission)
+
+To ensure the transparency and reproducibility of the methodological defenses presented in the revised manuscript, the following analysis scripts have been made available:
+
+### 1. Segmentation Fidelity Check (`analysis/1_visual_comparison.py`)
+*   **Context:** Addresses the concern regarding Gaussian smoothing in Figure 1.
+*   **Function:** Generates **Supplementary Figure 1**, demonstrating that quantitative Fractal Dimension extraction was performed on **raw binary masks** (preserving high-frequency voxel irregularity), while smoothing was applied solely for visual clarity in the main figure.
+
+### 2. Attrition & Selection Bias Analysis (`analysis/2_attrition_table.py`)
+*   **Context:** Addresses the exclusion of 106 patients due to missing clinical labels.
+*   **Function:** Performs T-tests on Age and Necrosis Volume between the Included (n=125) and Excluded (n=106) cohorts.
+*   **Result:** Generates **Supplementary Table 1**, confirming no statistically significant selection bias ($p > 0.05$).
+
+### 3. Multicollinearity Check (`analysis/3_vif_calculation.py`)
+*   **Context:** Addresses the loss of significance for Tumor Volume in the multivariate model.
+*   **Function:** Calculates the Variance Inflation Factor (VIF).
+*   **Result:** Confirms high collinearity between Fractal Dimension and Volume, supporting the "Morphological Power Law" hypothesis.
+
+### 🛠️ How to Run
+To test these scripts without access to restricted patient data, run the mock data generator first:
+```bash
+# 1. Generate dummy data with the same statistical properties as the cohort
+python data/generate_mock_data.py
+
+# 2. Run the statistical checks
+python analysis/2_attrition_table.py
+python analysis/3_vif_calculation.py
+
 ## ⚙️ Installation & Usage
 
 ### 1. Prerequisites
