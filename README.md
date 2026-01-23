@@ -56,15 +56,7 @@ To ensure the transparency and reproducibility of the methodological defenses pr
 *   **Function:** Calculates the Variance Inflation Factor (VIF).
 *   **Result:** Confirms high collinearity between Fractal Dimension and Volume, supporting the "Morphological Power Law" hypothesis.
 
-### 🛠️ How to Run
-To test these scripts without access to restricted patient data, run the mock data generator first:
-```bash
-# 1. Generate dummy data with the same statistical properties as the cohort
-python data/generate_mock_data.py
 
-# 2. Run the statistical checks
-python analysis/2_attrition_table.py
-python analysis/3_vif_calculation.py
 
 ## ⚙️ Installation & Usage
 
