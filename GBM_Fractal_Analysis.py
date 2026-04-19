@@ -16,7 +16,7 @@ from matplotlib.patches import Rectangle
 print("Libraries loaded. Ready for analysis.")
 
 # ==============================================================================
-# PART 2: THE MATH ENGINE (Raw Binary Data - No Smoothing)
+# PART 2: THE MATH  (Raw Binary Data - No Smoothing)
 # ==============================================================================
 def get_fractal_dimension(binary_mask):
     """
@@ -65,14 +65,14 @@ def get_fractal_dimension(binary_mask):
 # Data is already in FINAL_MASTER_DATA.csv for analysis.
 
 # ==============================================================================
-# PART 4: STATISTICAL ANALYSIS (The Complete Pipeline)
+# PART 4: STATISTICAL ANALYSIS ( Complete code)
 # ==============================================================================
 import pandas as pd
 import numpy as np
 from lifelines import CoxPHFitter
 from scipy.stats import pearsonr, ttest_ind
 
-# 1. Load and Prep Data
+# 1. Load and Prepare Data
 df = pd.read_csv('FINAL_MASTER_DATA.csv')
 df['LogVolume'] = np.log1p(df['Necrosis_Volume_mm3'])
 
@@ -120,10 +120,10 @@ else:
 print("-" * 60)
 
 print(">>> 3. MULTIVARIATE COX REGRESSION (Table 2 Right Column) <<<")
-# We use the surgical sub-cohort if possible to match the paper
+#  use the surgical sub-cohort if possible to match the paper
 if 'Extent_of_Resection' in df.columns:
     # Reuse the surg_df from above which has GTR/STR filtered
-    # We need to ensure it has Age/FD/Vol too (it does from df)
+    #  need to ensure it has Age/FD/Vol too (it does from df)
     # Re-prep the surgical dataframe to include all covariates
     multi_df = surg_df.dropna(subset=['Age', 'FractalDimension', 'LogVolume'])
     
@@ -166,7 +166,7 @@ def plot_figure_1(t1ce_path, seg_path):
     y = np.argmax(np.sum(necrosis, axis=(0,2)))
     x = np.argmax(np.sum(necrosis, axis=(1,2)))
     
-    sigma = 1.0  # smoothing for visualization only
+    sigma = 1.0  # smoothing for visualization only- reminder to note in paper 
     
     fig, axes = plt.subplots(2, 2, figsize=(10, 10), facecolor='black')
     ax1, ax2, ax3, ax4 = axes.flatten()
