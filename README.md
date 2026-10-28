@@ -16,7 +16,7 @@ This repository contains the full computational pipeline, statistical analysis, 
 
 ---
 
-## 📊 Key Findings
+#Findings
 *   **Morphological Law:** Glioblastoma necrosis follows a fractal architecture with high linearity ($R^2 > 0.99$).
 *   **Volume-Complexity Scaling:** There is a massive, positive linear correlation between Fractal Dimension and Log-Necrosis Volume ($r = 0.85, p < 10^{-67}$).
 *   **Survival Analysis:**
@@ -26,7 +26,7 @@ This repository contains the full computational pipeline, statistical analysis, 
 
 ---
 
-## 📂 Repository Structure
+# Repository Structure
 
 | File | Description |
 | :--- | :--- |
@@ -38,7 +38,7 @@ This repository contains the full computational pipeline, statistical analysis, 
 
 ---
 
-## 📂 Supplementary Analysis (Journal Submission)
+# Supplementary Analysis (Journal Submission)
 
 To ensure the transparency and reproducibility of the methodological defenses presented in the revised manuscript, the following analysis scripts have been made available:
 
@@ -58,7 +58,7 @@ To ensure the transparency and reproducibility of the methodological defenses pr
 
 
 
-## ⚙️ Installation & Usage
+# Installation & Usage
 
 ### 1. Prerequisites
 This project requires Python 3.7+ and the following libraries:
@@ -83,7 +83,7 @@ Math Engine: The raw 3D Box-Counting function.
 Data Extraction: Loops through patient folders to extract FD and Volume.
 Statistics: Runs Univariate/Multivariate Cox Models and T-Tests.
 Visualization: Generates the 4-panel manuscript figures (Anatomy, Correlation, Survival).
-📜 Citation & Data Acknowledgments
+ Citation & Data Acknowledgments
 This study utilized data from the Multimodal Brain Tumor Segmentation Challenge (BraTS). We acknowledge the data contributors and organizers:
 Menze BH, et al. "The Multimodal Brain Tumor Image Segmentation Benchmark (BRATS)." IEEE Transactions on Medical Imaging. 2015.
 Bakas S, et al. "Advancing The Cancer Genome Atlas glioma MRI collections with expert segmentation labels and radiomic features." Nature Scientific Data. 2017.
